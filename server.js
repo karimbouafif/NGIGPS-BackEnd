@@ -52,6 +52,8 @@ app.use(cookieParser());
 
 // ******************* call all routes ***************************
 app.use('/uploads',express.static('uploads'))
+app.use('/api', require('./routes'));
+
 // error handling middleware should be loaded after loading the routes
 app.use(errorHandler());
 
