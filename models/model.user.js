@@ -2,9 +2,9 @@ const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema(
     {
-        
+       
 
-        local: {
+      
             username: {
                 type: String,
                 index: true
@@ -29,8 +29,8 @@ const UserSchema = new mongoose.Schema(
             role:{
                 type: String
             },
-        },
-       
+        
+     
     
     },
     {
