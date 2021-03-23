@@ -13,6 +13,27 @@ const validateLoginInput  = require('../../validation/login');
 //load User model
 const User =require('../../models/model.user');
 
+
+
+signToken = user => {
+    return JWT.sign(
+        {
+          iss: "ngigps backend server",
+          sub: user.id,
+          iat: new Date().getTime(),
+          exp: new Date().setDate(new Date().getMonth() + 1),
+          user: user
+        },
+       keys.secretOrKey
+    );
+  };
+
+
+
+
+
+
+
 // @route    GET api/users/test
 // @desc     Tests user route 
 // @access   Public 
