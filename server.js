@@ -14,7 +14,7 @@ const app =express();
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
 
-
+mongoose.set('useUnifiedTopology', true);
 //db Config 
 require('dotenv').config({ path: 'env.txt' });
 
@@ -34,10 +34,7 @@ require('./config/passport')(passport);
 
 //USE ROUTES
 
-app.use('/api/users',users);
-app.use('/api/profile',profile);
-app.use('/api/posts',posts);
-
+app.use('/api', require('./routes/api'));
 
 const port = process.env.port || 4000 ; 
 

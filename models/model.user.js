@@ -2,9 +2,13 @@ const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema(
     {
-       
+        method: {
+            type: String,
+            enum: ['local', 'google', 'facebook'],
+            required: true
+        },
 
-      
+        local: {
             username: {
                 type: String,
                 index: true
@@ -29,9 +33,41 @@ const UserSchema = new mongoose.Schema(
             role:{
                 type: String
             },
-        
-     
-    
+        },
+        google: {
+            id: {
+                type: String
+            },
+            fullname: {
+                type: String,
+            },
+            email: {
+                type: String,
+                //unique: true,
+                lowercase: true
+            },
+            number: {
+                type: Number,
+                //unique: true
+            }
+        },
+        facebook: {
+            id: {
+                type: String
+            },
+            fullname: {
+                type: String,
+            },
+            email: {
+                type: String,
+                //unique: true,
+                lowercase: true
+            },
+            number: {
+                type: Number,
+                //unique: true
+            }
+        },
     },
     {
         timestamps: true

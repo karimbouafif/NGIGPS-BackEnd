@@ -39,125 +39,78 @@ signToken = user => {
 // @access   Public 
 router.get('/test', (req,res) =>res.json({msg : 'Users works'}));
 
-// @route    GET api/users/register
-// @desc      Register user
-// @access    Public 
-router.post('/register',(req,res)=>{
-    
-    const {errors, isValid} = validateRegisterInput(req.body);
+// @route   GET api/users/register
+// @desc    Register user
+// @access  Public
+router.post('/register', (req, res) => {
+  const { username, password, email} = req.body;
+  User.findOne({ "local.email" :email }).then(user => {
+    if (user) {
+      return res.status(400).json('Email already exists !');
+    }
+    const avatar = gravatar.url(email, {s: '100', r: 'x', d: 'retro'}, false);
+    const newUser = new User({
+      method: 'local',
+      local:
+          {
+            username:username,
+            email:email,
+            avatar:avatar,
+            password:password,
+            role:"admin"}
+    });
 
-//Check Validation 
-if(!isValid){
+    bcrypt.genSalt(10, (err, salt) => {
+      bcrypt.hash(newUser.local.password, salt, (err, hash) => {
+        if (err) throw err;
+        newUser.local.password = hash;
+        newUser
+            .save((err) => {
+              if (err)  {
+                console.log(err.toString());
+                res.status(400).json('Register has failed')
+              }
+              else
+                return res.status(200).json('User is succsessfully added');
+            })
 
-    return res.status(400).json(errors); 
-}
-    
-    User.findOne({email:req.body.email})
-        .then(user=>{
-            if(user){
-                errors.email = 'Email already exists'
-                return res.status(400).json({email:'Email already exists'});
-            }else{
-                    const avatar = gravatar.url(req.body.email,{
-                        s:'200', //size
-                        r:'pg',  //rating
-                        d:'mm'   //Default
-
-                    });
-
-                const newUser = new User(
-                    {
-
-                        username:req.body.username,
-                        email:req.body.email,
-                        avatar,
-                        password:req.body.password,
-                    }
-                );
-
-                bcrypt.genSalt(10,(err,salt)=>{
-
-                    bcrypt.hash(newUser.password,salt,(err,hash)=>{
-
-                        if(err) throw err; 
-                        newUser.password = hash ;
-                        newUser.save()
-                                .then(user=>res.json(user))
-                                .catch(err=>console.log(err))
-                    })
-                }
-                
-                )
-            }
-        });
-
+      });
+    });
+  });
 });
-// @route    GET api/users/login
-// @desc      Login user / Returning JWT Token 
-// @access    Public 
-router.post('/login', (req,res)=>
-{
-
-    const {errors, isValid} = validateLoginInput(req.body);
-
-//Check Validation 
-if(!isValid){
-
-    return res.status(400).json(errors); 
-}
-
-const email =req.body.email ; 
-const password=req.body.password; 
-
-//Find user by email 
-
-User.findOne({email})
-    .then(user => 
-        {
-//check for user 
-if(!user){
-        errors.email= 'User not found';
-        return res.status(404).json(errors);
-}
-
-//Check password 
-bcrypt.compare(password, user.password)
-        .then(isMatch => {
 
 
-            if(isMatch){
-            //User Matched 
-
-const payload= {id:user.id, username:user.username,avatar:user.avatar} // Create JWT payload
-
-
-
-//Sign Token 
-jwt.sign(payload,
-    keys.secretOrKey,
-     {expiresIn: 3600},
-     (err, token)=>
-     {
-        res.json({
-            success: true,
-            token : 'Bearer ' + token
-        });
-
-     }
-     
-     );
-              
-            }else{
-                errors.password = 'Password incorrect';
-
-                return res.status(400).json(errors)
-            }
-        });
-
-
-        });
-
-
+// @route   GET api/users/login
+// @desc    Login User / Returning JWT Token
+// @access  Public
+router.post('/login', (req, res) => {
+  let { username, password } = req.body;
+  // Find user by username
+  User.findOne({ "local.username" :username }).then(user => {
+    // Check for user
+    if (!user) {
+      return res.status(400).json('user not found');
+    }
+    // Check Password
+    if (user.local.role==="admin"){
+      bcrypt.compare(password, user.local.password).then(isMatch => {
+        if (isMatch) {
+          const id = user;
+          const {  username, email, avatar } = user.local;
+          const payload = { id, username, email, avatar };
+          // Sign Token
+          jwt.sign(payload, keys.secretOrKey, { expiresIn: "20 days" }, (err, token) => {
+            return res.json({
+              success: true,
+              token,
+            });
+          });
+        } else {
+          return res.status(400).json('Password incorrect');
+        }
+      });
+    }
+  });
 });
 // @route    GET api/users/current  
 // @desc     return current user
