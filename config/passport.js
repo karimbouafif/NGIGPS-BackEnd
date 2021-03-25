@@ -2,6 +2,9 @@ const JwtStrategy = require('passport-jwt').Strategy;
 const { ExtractJwt } = require('passport-jwt');
 const mongoose    = require('mongoose');
 const User = mongoose.model('users');
+const LocalStrategy = require("passport-local").Strategy;
+var GoogleTokenStrategy = require('passport-google-id-token');
+const FacebookTokenStrategy = require('passport-facebook-token');
 const keys = require('../config/keys');
 
 
@@ -10,6 +13,12 @@ const opts ={};
 opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 opts.secretOrKey = keys.secretOrKey;
 
+
+const googleClientID = process.env.GOOGLECLIENTID;
+const googleClientSecret = process.env.GOOGLECLIENTSECRET;
+
+const facebookClientID = process.env.FACEBOOKCLIENTID;
+const facebookClientSecret =  process.env.FACEBOOKCLIENTSECRET;
 
 
 module.exports = passport => {
@@ -31,5 +40,98 @@ module.exports = passport => {
         }
         )
     );
+
+
+    passport.use('mobile',
+        new JwtStrategy(
+            {
+                jwtFromRequest: ExtractJwt.fromHeader("auth"),
+                secretOrKey: keys.secretOrKey
+            },
+            async (payload, done) => {
+                try {
+                    console.log("yo");
+                    // Find the user specified in token
+                    //console.log(payload.sub);
+                    const user = await User.findById(payload.sub);
+                    //console.log(user);
+
+                    // if user doesn't exist, handle it
+                    if (!user) {
+                        return done(null, false);
+                    }
+                    // otherwise, return the user
+                    done(null, user);
+                } catch (error) {
+                    console.log("yo");
+                    done(error, false);
+                }
+            }
+        )
+    );
+    passport.use(new GoogleTokenStrategy({
+        clientID: googleClientID,
+        clientSecret: googleClientSecret
+    }, async (parsedToken, googleId, done) => {
+        try {
+            // check whether this current user exists in our DB
+            const existingUser = await User.findOne({ "google.id": googleId });
+            if(existingUser)
+                return done(null, existingUser);
+            else
+            {
+                done(null, false, 'unauthorized : no such account for given id token');
+            }
+        } catch(error) {
+            done(error, false, error.message);
+        }
+    }));
+    passport.use('facebookToken', new FacebookTokenStrategy({
+        clientID: facebookClientID,
+        clientSecret: facebookClientSecret
+    }, async (accessToken, refreshToken, profile, done) => {
+        try {
+            // check whether this current user exists in our DB
+            const existingUser = await User.findOne({ "facebook.id": profile.id });
+            if(existingUser) {
+                return done(null, existingUser);
+            }
+            else
+            {
+                done(null, false, 'unauthorized : no such account for given access token');
+            }
+        } catch(error) {
+            done(error, false, error.message);
+        }
+    }));
+    passport.use(
+        new LocalStrategy(
+            {
+                usernameField: "number"
+            },
+            async (number, password, done) => {
+                try {
+                    // Find the user given the phone number
+                    const user = await User.findOne({ "local.number": number });
+                    // If not, handle it
+                    if (!user) {
+                        return done(null, false);
+                    }
+                    // Check if the password is correct
+                    const isMatch = await user.isValidPassword(password);
+                    // If not, handle it
+                    if (!isMatch) {
+                        return done(null, false);
+                    }
+                    // Otherwise, return the user
+                    done(null, user);
+                } catch (error) {
+                    done(error, false);
+                }
+            }
+        )
+    );
+
+
 
 };

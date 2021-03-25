@@ -11,7 +11,7 @@ const validateRegisterInput =require('../../validation/register');
 const validateLoginInput  = require('../../validation/login');
 
 //load User model
-const User =require('../../models/model.user');
+const {UserModel} = require('../../models');
 
 
 
@@ -39,17 +39,28 @@ signToken = user => {
 // @access   Public 
 router.get('/test', (req,res) =>res.json({msg : 'Users works'}));
 
+
+// get all users
+router.get('/', passport.authenticate('jwt', { session: false }),(req, res) => {
+  UserModel.find((err, users) => {
+    if (err) console.log(err);
+    return res.json(users);
+  }); 
+});
+
+
+
 // @route   GET api/users/register
 // @desc    Register user
 // @access  Public
 router.post('/register', (req, res) => {
   const { username, password, email} = req.body;
-  User.findOne({ "local.email" :email }).then(user => {
+  UserModel.findOne({ "local.email" :email }).then(user => {
     if (user) {
       return res.status(400).json('Email already exists !');
     }
     const avatar = gravatar.url(email, {s: '100', r: 'x', d: 'retro'}, false);
-    const newUser = new User({
+    const newUser = new UserModel({
       method: 'local',
       local:
           {
@@ -86,7 +97,7 @@ router.post('/register', (req, res) => {
 router.post('/login', (req, res) => {
   let { username, password } = req.body;
   // Find user by username
-  User.findOne({ "local.username" :username }).then(user => {
+  UserModel.findOne({ "local.username" :username }).then(user => {
     // Check for user
     if (!user) {
       return res.status(400).json('user not found');
@@ -112,19 +123,79 @@ router.post('/login', (req, res) => {
     }
   });
 });
-// @route    GET api/users/current  
-// @desc     return current user
-// @access    Private 
-router.get('/current',passport.authenticate('jwt',{ session: false }), 
-(req,res)=> {
+router.post('/mobile/signin', (req, res,done) => {
+  passport.authenticate("local", { session: false }, function(err, user, info)
+  {
+    if (err) res.send(err);
+    if (!user) res.send("unauthorized");
+    if (user) done();
+  })(req, res, done);
 
-res.json({
+  const token = signToken(new UserModel(req.body));
+  res.status(200).send({ token });
 
-id: req.user.id,
-username:req.user.username,
-email:req.user.email
 
-})
+});
+router.post('/mobile/oauth/google', (req, res,done) => {
+  passport.authenticate("google-id-token", { session: false }, function(err, user, info)
+  {
+    if (err) res.send(err);
+    else if (user == false)
+      res.status(401).send(info);
+    else {
+      req.body = user;
+      const token = signToken(new UserModel(req.body));
+      res.status(200).send({ token });
+      done();
+    }
+  })(req, res, done);
+
+  console.log(req.body);
+
+
+});
+router.post('/mobile/oauth/facebook', (req, res,done) => {
+  passport.authenticate("facebookToken", { session: false }, function(err, user, info)
+  {
+    if (err) res.send(err);
+    else if (user == false)
+      res.status(401).send(info);
+    else {
+      req.body = user;
+      const token = signToken(new UserModel(req.body));
+      res.status(200).send({ token });
+      done();
+    }
+  })(req, res, done);
+
+
+
+});
+
+// update user
+router.post('/update/:id', (req, res) => {
+  var { email, password } = req.body;
+  UserModel.findById(req.params.id, function(err, doc) {
+    if (err)
+      console.log(err);
+    doc.email = email;
+    doc.avatar = gravatar.url(email, {s: '100', r: 'x', d: 'retro'}, false);
+    doc.password = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
+    doc.save((err, doc) => {
+      if (err) res.send(err);
+      else {
+        const {id, username , email, avatar, createdAt } = doc;
+        res.send({id, username , email, avatar, createdAt});}
+    });
+  });
+});
+
+// get user by id
+router.get('/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
+  UserModel.findById(req.params.id, (err, user) => {
+    if (err) console.log(err);
+    return res.json(user);
+  });
 });
 
 
