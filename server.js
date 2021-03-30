@@ -1,51 +1,82 @@
-const express =require('express');
-const mongoose =require('mongoose');
-const bodyParser =require('body-parser');
-const passport  = require('passport');
-const UserModel = require("./models/model.user");
 
-const users = require('./routes/api/users');
-const profile =require('./routes/api/profile');
-const posts = require('./routes/api/posts');
-
-const app =express();
-let server = require('http').createServer(app);
-//Body parser middleware 
-app.use(bodyParser.urlencoded({extended:false}));
-app.use(bodyParser.json());
-
-mongoose.set('useUnifiedTopology', true);
-//db Config 
 require('dotenv').config({ path: 'env.txt' });
 
-//Connect to MongoDB 
+
+const express = require('express');
+const logger = require('morgan');
+const methodOverride = require('method-override');
+const cookieParser = require('cookie-parser');
+const passport = require('passport');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const errorHandler = require('errorhandler');
+const mongoose = require('mongoose');
+const UserModel = require("./models/model.user");
+const keys = require('./config/keys');
+let app = express();
+let server = require('http').createServer(app);
+
+let mongoUrl = keys.mongoURI;
+
+mongoose.set('useUnifiedTopology', true);
 
 mongoose
-        .connect(process.env.MONGO_URI, {useNewUrlParser:true })
-        .then(()=> console.log('MongDb connected'))
-        .catch(err=> console.log(err));
-
-//Passport Middleware 
+  .connect(mongoUrl, {
+    useCreateIndex: true,
+    useNewUrlParser: true,
+    useFindAndModify: false 
+  })
+  .then(() => {
+    console.log('Connected to Local MongoDB');
+  })
+  .catch(err => {
+    console.log('MongoDB connection error. Please make sure MongoDB is running. ' + err);
+    process.exit();
+  });
+// Passport middleware
 app.use(passport.initialize());
 app.use(passport.session());
-//Passport Config 
+// Passport Config
 require('./config/passport')(passport);
 
 passport.serializeUser(function(user, cb) {
-        cb(null, user.id);
-      });
-      
-      passport.deserializeUser(function(id, cb) {
-        UserModel.findById(id, function(err, user) {
-          cb(err, user);
-        });
-      });
+  cb(null, user.id);
+});
 
+passport.deserializeUser(function(id, cb) {
+  UserModel.findById(id, function(err, user) {
+    cb(err, user);
+  });
+});
 
-//USE ROUTES
+app.set('port', process.env.SERVER_PORT || 4000);
+// allow-cors
+app.use(cors());
 
+app.use(logger('tiny'));
+
+app.use(bodyParser.json());
+app.use(
+  bodyParser.urlencoded({
+    extended: true
+  })
+);
+app.use(methodOverride());
+app.use(cookieParser());
+
+// ******************* call all routes ***************************
+app.use('/uploads',express.static('uploads'))
 app.use('/api', require('./routes/api'));
 
-const port = process.env.port || 4000 ; 
+// error handling middleware should be loaded after loading the routes
+app.use(errorHandler());
 
-app.listen(port,()=>console.log(`Server running on port ${port}`));
+server.listen(app.get('port'), error => {
+  if (error) {
+    //console.error(`\n${error}`);
+    server.close();
+    process.exit(1);
+  }
+  console.log(`Server Listening at http://localhost:${app.get('port')}/`);
+});
+

@@ -1,36 +1,42 @@
 const express = require('express');
 const router = express.Router();
-const gravatar = require('gravatar');
+const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const jwt   = require('jsonwebtoken');
-const keys = require('../../config/keys');
+const gravatar = require('gravatar');
 const passport = require('passport');
-
-//Load Input Validation 
-const validateRegisterInput =require('../../validation/register');
-const validateLoginInput  = require('../../validation/login');
-
+const JWT = require("jsonwebtoken");
+const stripeApi = require('stripe')(process.env.STRIPESECRETKEY);
 //load User model
 const {UserModel} = require('../../models');
+const keys = require('../../config/keys');
 
 
+const JWT_SECRET = process.env.TOKEN_KEY;
 
-signToken = user => {
-    return JWT.sign(
-        {
-          iss: "ngigps backend server",
-          sub: user.id,
-          iat: new Date().getTime(),
-          exp: new Date().setDate(new Date().getMonth() + 1),
-          user: user
-        },
-       keys.secretOrKey
-    );
-  };
+signToken = (user,payload) => {
+  return JWT.sign(
+      {
+        iss: "NGI GPS backend server",
+        sub: user.id ,
+        iat: new Date().getTime(),
+        exp: new Date().setDate(new Date().getMonth() + 1),
+        additional: payload,
+        user: user
+      },
+      JWT_SECRET
+  );
+};
 
 
-
-
+/*
+// get  user
+router.get('/current', passport.authenticate('jwt', { session: false }),(req, res) => {
+  UserModel.find((err, user) => {
+    if (err) console.log(err);
+    return res.json(user);
+  });
+});
+*/
 
 
 
@@ -54,7 +60,7 @@ router.get('/', passport.authenticate('jwt', { session: false }),(req, res) => {
 // @desc    Register user
 // @access  Public
 router.post('/register', (req, res) => {
-  const { username, password, email} = req.body;
+  const { username, password, email,fullname} = req.body;
   UserModel.findOne({ "local.email" :email }).then(user => {
     if (user) {
       return res.status(400).json('Email already exists !');
@@ -65,6 +71,7 @@ router.post('/register', (req, res) => {
       local:
           {
             username:username,
+            fullname:fullname,
             email:email,
             avatar:avatar,
             password:password,
@@ -94,47 +101,64 @@ router.post('/register', (req, res) => {
 // @route   GET api/users/login
 // @desc    Login User / Returning JWT Token
 // @access  Public
-router.post('/login', (req, res) => {
-  let { username, password } = req.body;
+router.post('/login', (req, res,done) => {
+  let { number, password  } = req.body;
   // Find user by username
-  UserModel.findOne({ "local.username" :username }).then(user => {
+  UserModel.findOne({ "local.number" :number }).then(user => {
     // Check for user
     if (!user) {
-      return res.status(400).json('user not found');
+      return res.status(400);
     }
     // Check Password
     if (user.local.role==="admin"){
       bcrypt.compare(password, user.local.password).then(isMatch => {
         if (isMatch) {
           const id = user;
-          const {  username, email, avatar } = user.local;
+          const {  username, email, avatar, } = user.local;
           const payload = { id, username, email, avatar };
           // Sign Token
-          jwt.sign(payload, keys.secretOrKey, { expiresIn: "20 days" }, (err, token) => {
+          jwt.sign(payload, process.env.TOKEN_KEY, { expiresIn: "20 days" }, (err, token) => {
             return res.json({
               success: true,
               token,
             });
           });
         } else {
-          return res.status(400).json('Password incorrect');
+          return res.status(401).json('Password incorrect');
         }
       });
     }
   });
 });
 router.post('/mobile/signin', (req, res,done) => {
+  let { number, password  } = req.body;
   passport.authenticate("local", { session: false }, function(err, user, info)
   {
-    if (err) res.send(err);
-    if (!user) res.send("unauthorized");
-    if (user) done();
+  
+    UserModel.findOne({ "local.number" :number }).then(user => {
+      // Check for user
+      if (!user) {
+        return res.status(400);
+      }
+      // Check Password
+      if (user.local.role==="admin"){
+        bcrypt.compare(password, user.local.password).then(isMatch => {
+          if (isMatch) {
+            const id = user;
+            const {  username, email , number, fullname } = user.local;
+            const payload = {  username, email , number , fullname };
+            // Sign Token
+            const token = signToken(new UserModel(req.body),payload,keys.secretOrKey);
+    res.status(200).send({ token });
+          } else {
+            return res.status(401);
+          }
+        });
+      }
+    });
   })(req, res, done);
-
-  const token = signToken(new UserModel(req.body));
-  res.status(200).send({ token });
-
-
+  
+  
 });
 router.post('/mobile/oauth/google', (req, res,done) => {
   passport.authenticate("google-id-token", { session: false }, function(err, user, info)
@@ -144,8 +168,8 @@ router.post('/mobile/oauth/google', (req, res,done) => {
       res.status(401).send(info);
     else {
       req.body = user;
-      const token = signToken(new UserModel(req.body));
-      res.status(200).send({ token });
+      const token = sign(new UserModel(req.body));
+      res.status(200).json({ token });
       done();
     }
   })(req, res, done);
@@ -198,7 +222,34 @@ router.get('/:id', passport.authenticate('jwt', { session: false }), (req, res) 
   });
 });
 
+router.post('/mobile/signup/local', (req, res,done) => {
+  const { fullname, email, password, number, username } = req.body;
 
+  const newUser = new UserModel({
+    method: 'local',
+    local: {
+      fullname: fullname,
+      email: email,
+      password: password,
+      number: number,
+      username:username
+    }
+  });
+  try {
+    newUser.save();
+    // generate a JWT token
+    const token = signToken(newUser);
+
+ 
+
+    // respond with token
+    res.status(200).send({ token });
+  } catch (err) {
+    throw (err);
+  }
+
+
+});
 
 
 module.exports = router ; 

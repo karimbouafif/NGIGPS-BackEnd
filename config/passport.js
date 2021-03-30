@@ -1,17 +1,20 @@
 const JwtStrategy = require('passport-jwt').Strategy;
 const { ExtractJwt } = require('passport-jwt');
 const mongoose    = require('mongoose');
-const User = mongoose.model('users');
+const User = require('./../models/model.user');
 const LocalStrategy = require("passport-local").Strategy;
 var GoogleTokenStrategy = require('passport-google-id-token');
 const FacebookTokenStrategy = require('passport-facebook-token');
 const keys = require('../config/keys');
 
+require('dotenv').config({ path: 'env.txt' });
+
+const key = process.env.TOKEN_KEY;
 
 const opts ={};
-
 opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
-opts.secretOrKey = keys.secretOrKey;
+opts.secretOrKey = key;
+
 
 
 const googleClientID = process.env.GOOGLECLIENTID;
@@ -36,39 +39,39 @@ module.exports = passport => {
                 return done(null , false);
             })
 
-            .catch(err => console.log(err));
+            .catch(err=> console.log(err));
         }
         )
     );
 
 
     passport.use('mobile',
-        new JwtStrategy(
-            {
-                jwtFromRequest: ExtractJwt.fromHeader("auth"),
-                secretOrKey: keys.secretOrKey
-            },
-            async (payload, done) => {
-                try {
-                    console.log("yo");
-                    // Find the user specified in token
-                    //console.log(payload.sub);
-                    const user = await User.findById(payload.sub);
-                    //console.log(user);
+    new JwtStrategy(
+        {
+            jwtFromRequest: ExtractJwt.fromHeader("auth"),
+            secretOrKey: key
+        },
+        async (payload, done) => {
+            try {
+                console.log("yo");
+                // Find the user specified in token
+                console.log(payload.sub);
+                const user = await User.findById(payload.sub);
+                console.log(user);
 
-                    // if user doesn't exist, handle it
-                    if (!user) {
-                        return done(null, false);
-                    }
-                    // otherwise, return the user
-                    done(null, user);
-                } catch (error) {
-                    console.log("yo");
-                    done(error, false);
+                // if user doesn't exist, handle it
+                if (!user) {
+                    return done(null, false);
                 }
+                // otherwise, return the user
+                done(null, user);
+            } catch (error) {
+                console.log("yo");
+                done(error, false);
             }
-        )
-    );
+        }
+    )
+);
     passport.use(new GoogleTokenStrategy({
         clientID: googleClientID,
         clientSecret: googleClientSecret
@@ -107,7 +110,8 @@ module.exports = passport => {
     passport.use(
         new LocalStrategy(
             {
-                usernameField: "number"
+                usernameField: "number",
+                passwordField: "password"
             },
             async (number, password, done) => {
                 try {
