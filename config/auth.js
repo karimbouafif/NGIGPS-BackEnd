@@ -1,13 +1,14 @@
-var jwt = require('jsonwebtoken');
+var JWT = require('jsonwebtoken');
+var keys = require('../config/keys');
 require('dotenv').config({ path: 'env.txt' });
-var secret = process.env.TOKEN_KEY;
+var secret =keys.secretOrKey;
 
 
  const auth = function (req, res, next) {
     if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Token' ||
         req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
         let token = req.headers.authorization.split(' ')[1];
-        jwt.verify(token, secret, function (err, decoded) {
+        JWT.verify(token, secret, function (err, decoded) {
             if (err) {
                 console.log(err);
                 res.status(401).json('Unauthorized');

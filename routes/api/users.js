@@ -11,7 +11,12 @@ const {UserModel} = require('../../models');
 const keys = require('../../config/keys');
 
 
-const JWT_SECRET = process.env.TOKEN_KEY;
+// Load input validation
+const validateRegisterInput = require("../../validation/register");
+const validateLoginInput = require("../../validation/login");
+
+
+const JWT_SECRET = keys.secretOrKey;
 
 signToken = (user,payload) => {
   return JWT.sign(
@@ -20,23 +25,28 @@ signToken = (user,payload) => {
         sub: user.id ,
         iat: new Date().getTime(),
         exp: new Date().setDate(new Date().getMonth() + 1),
-        additional: payload,
-        user: user
+        //additional: payload,
+       user:user,
+       
       },
+      
       JWT_SECRET
   );
 };
 
 
-/*
-// get  user
-router.get('/current', passport.authenticate('jwt', { session: false }),(req, res) => {
-  UserModel.find((err, user) => {
-    if (err) console.log(err);
-    return res.json(user);
-  });
+router.get('/current' , passport.authenticate('jwt',{session:false}),
+(req,res)=> {
+
+res.json({
+
+  id:req.user.id,
+  username:req.user.username,
+  email:req.user.email,
 });
-*/
+}
+
+);
 
 
 
@@ -56,103 +66,138 @@ router.get('/', passport.authenticate('jwt', { session: false }),(req, res) => {
 
 
 
-// @route   GET api/users/register
-// @desc    Register user
-// @access  Public
-router.post('/register', (req, res) => {
-  const { username, password, email,fullname} = req.body;
-  UserModel.findOne({ "local.email" :email }).then(user => {
+// @route POST api/users/register
+// @desc Register user
+// @access Public
+router.post("/register", (req, res) => {
+  // Form validation
+const { errors, isValid } = validateRegisterInput(req.body);
+// Check validation
+  if (!isValid) {
+    return res.status(400).json(errors);
+  }
+  UserModel.findOne({ email: req.body.email }).then(user => {
     if (user) {
-      return res.status(400).json('Email already exists !');
-    }
-    const avatar = gravatar.url(email, {s: '100', r: 'x', d: 'retro'}, false);
-    const newUser = new UserModel({
-      method: 'local',
-      local:
-          {
-            username:username,
-            fullname:fullname,
-            email:email,
-            avatar:avatar,
-            password:password,
+      return res.status(400).json({ email: "Email already exists" });
+    } else {
+      const newUser = new UserModel({
+      
+            username:req.body.username,
+            email:req.body.email,
+            number:req.body.number,
+            fullname:req.body.fullname,
+            //avatar:avatar,
+            password:req.body.password,
             role:"admin"}
-    });
+    );
 
-    bcrypt.genSalt(10, (err, salt) => {
-      bcrypt.hash(newUser.local.password, salt, (err, hash) => {
-        if (err) throw err;
-        newUser.local.password = hash;
-        newUser
-            .save((err) => {
-              if (err)  {
-                console.log(err.toString());
-                res.status(400).json('Register has failed')
-              }
-              else
-                return res.status(200).json('User is succsessfully added');
-            })
-
+    
+// Hash password before saving in database
+      bcrypt.genSalt(10, (err, salt) => {
+        bcrypt.hash(newUser.password, salt, (err, hash) => {
+          if (err) throw err;
+          newUser.password = hash;
+          newUser
+            .save()
+            .then(user => res.json(user))
+            .catch(err => console.log(err));
+        });
       });
-    });
+    }
   });
 });
 
 
-// @route   GET api/users/login
-// @desc    Login User / Returning JWT Token
-// @access  Public
-router.post('/login', (req, res,done) => {
-  let { number, password  } = req.body;
-  // Find user by username
-  UserModel.findOne({ "local.number" :number }).then(user => {
-    // Check for user
+// @route POST api/users/login
+// @desc Login user and return JWT token
+// @access Public
+router.post("/login", (req, res) => {
+  // Form validation
+const { errors, isValid } = validateLoginInput(req.body);
+// Check validation
+  if (!isValid) {
+    return res.status(400).json(errors);
+  }
+  
+const email = req.body.email;
+  const password = req.body.password;
+// Find user by email
+  UserModel.findOne({  "email" :email }).then(user => {
+    // Check if user exists
     if (!user) {
-      return res.status(400);
+      return res.status(404).json({ emailnotfound: "Email not found" });
     }
-    // Check Password
-    if (user.local.role==="admin"){
-      bcrypt.compare(password, user.local.password).then(isMatch => {
-        if (isMatch) {
-          const id = user;
-          const {  username, email, avatar, } = user.local;
-          const payload = { id, username, email, avatar };
-          // Sign Token
-          jwt.sign(payload, process.env.TOKEN_KEY, { expiresIn: "20 days" }, (err, token) => {
-            return res.json({
+// Check password
+if (user.role==="admin"){
+    bcrypt.compare(password, user.password).then(isMatch => {
+      if (isMatch) {
+        // User matched
+        // Create JWT Payload
+
+        
+     const payload ={id:user.id, username:user.username,number:user.number, fullname:user.fullname, avatar:user.avatar}   
+     
+        
+// Sign token
+        jwt.sign(
+          payload,
+          keys.secretOrKey,
+          {
+            expiresIn: 3600
+          },
+          (err, token) => {
+            res.json({
               success: true,
-              token,
+              token 
             });
-          });
-        } else {
-          return res.status(401).json('Password incorrect');
-        }
-      });
-    }
+          }
+        );
+      } else {
+        return res
+          .status(400)
+          .json({ passwordincorrect: "Password incorrect" });
+      }
+    });
+  }
   });
 });
+
+
+
+
+
+
+
+
+
+
+
+
 router.post('/mobile/signin', (req, res,done) => {
-  let { number, password  } = req.body;
-  passport.authenticate("local", { session: false }, function(err, user, info)
+  let { email, password  } = req.body;
+  passport.authenticate("jwt", { session: false }, function(err, user, info)
   {
   
-    UserModel.findOne({ "local.number" :number }).then(user => {
+    UserModel.findOne({ "email" :email }).then(user => {
       // Check for user
       if (!user) {
         return res.status(400);
       }
       // Check Password
-      if (user.local.role==="admin"){
-        bcrypt.compare(password, user.local.password).then(isMatch => {
+      if (user.role==="admin"){
+        bcrypt.compare(password, user.password).then(isMatch => {
           if (isMatch) {
-            const id = user;
-            const {  username, email , number, fullname } = user.local;
-            const payload = {  username, email , number , fullname };
+            const payload ={id:user.id, username:user.username,number:user.number, fullname:user.fullname, avatar:user.avatar}   
             // Sign Token
-            const token = signToken(new UserModel(req.body),payload,keys.secretOrKey);
-    res.status(200).send({ token });
-          } else {
-            return res.status(401);
-          }
+         jwt.sign(payload, keys.secretOrKey, { expiresIn: "20 days" }, (err, token) => {
+            return res.json({
+              success: true,
+              token :"Bearer " + token,
+          
+            });
+          });
+             
+           }
         });
       }
     });

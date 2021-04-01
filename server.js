@@ -13,6 +13,8 @@ const errorHandler = require('errorhandler');
 const mongoose = require('mongoose');
 const UserModel = require("./models/model.user");
 const keys = require('./config/keys');
+
+
 let app = express();
 let server = require('http').createServer(app);
 
@@ -79,4 +81,3 @@ server.listen(app.get('port'), error => {
   }
   console.log(`Server Listening at http://localhost:${app.get('port')}/`);
 });
-
