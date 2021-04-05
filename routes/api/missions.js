@@ -61,6 +61,8 @@ router.post(
       title: req.body.title,
       dateStart: req.body.dateStart,
       dateEnd: req.body.dateEnd,
+      start_adress:req.body.start_adress,
+      end_adress:req.body.end_adress,
       description: req.body.description,
       type: req.body.type,
       archived: false,
