@@ -11,21 +11,21 @@ let start;
 
 if (os.type() === 'Linux')
   start = spawn(
-    'concurrently "nodemon server.js" ',
+    'concurrently "nodemon server.js" "cd client/backend && set PORT=3002 && npm start"',
     {
       shell: true
     }
   );
 else if (os.type() === 'Darwin')
   start = spawn(
-    'concurrently "nodemon server.js" ',
+    'concurrently "nodemon server.js" "cd client/backend && set PORT=3002 && npm start" ',
     {
       shell: true
     }
   );
 else if (os.type() === 'Windows_NT')
   start = spawn(
-    'concurrently "nodemon server.js" ',
+    'concurrently "nodemon server.js" "cd client/backend && set PORT=3002 && npm start" ',
     {
       shell: true
     }
