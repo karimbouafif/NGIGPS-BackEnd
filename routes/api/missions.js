@@ -65,9 +65,9 @@ router.post(
       end_adress:req.body.end_adress,
       description: req.body.description,
       type: req.body.type,
-      archived: false,
+     // archived: false,
       url: req.body.url,
-      image: "image",
+    //  image: "image",
       user: req.body.user,
     });
 

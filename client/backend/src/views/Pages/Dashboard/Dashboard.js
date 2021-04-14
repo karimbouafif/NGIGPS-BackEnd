@@ -114,7 +114,7 @@ class Dashboard extends Component {
             <Col>
               <Card>
                 <CardHeader style={{backgroundColor: "#00853e"}}>
-                  <h2>ShareBike Dashboard</h2>
+                  <h2>NGI GPS Dashboard</h2>
                 </CardHeader>
                 <CardBody  >
                   <div className='col-11'>

@@ -2,7 +2,7 @@ export default {
   items: [
     {
       title: true,
-      name: "SHARE BIKE ADMINSPACE"
+      name: "NGI GPS ADMINSPACE"
     },
     {
       name: "Dashboard",
@@ -32,7 +32,7 @@ export default {
       ]
     },
     {
-      name: "Evénements",
+      name: "Missions",
       icon: "fa fa-quote-right",
       children: [
         {
@@ -47,6 +47,7 @@ export default {
         }
       ]
     },
+    /*
     {
       name: "Stations",
       icon: "fa fa-quote-right",
@@ -90,5 +91,7 @@ export default {
         }
       ]
     }
+    */
   ]
+  
 };

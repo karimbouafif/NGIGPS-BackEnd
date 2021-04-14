@@ -24,7 +24,7 @@ class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: "",
+      email: "",
       password: "",
       message: "",
       visible: false
@@ -61,7 +61,7 @@ class Login extends Component {
   onSubmit = e => {
     e.preventDefault();
     const userData = {
-      username: this.state.username,
+      email: this.state.email,
       password: this.state.password
     };
     this.props.loginUser(userData);
@@ -95,10 +95,10 @@ class Login extends Component {
                         <Input
                           onChange={this.onChange}
                           type="text"
-                          placeholder="Username"
-                          autoComplete="username"
-                          name="username"
-                          value={this.state.username}
+                          placeholder="email"
+                          autoComplete="email"
+                          name="email"
+                          value={this.state.email}
                         />
                       </InputGroup>
                       <InputGroup className="mb-4">
@@ -156,8 +156,7 @@ class Login extends Component {
                     <div>
                       <h2>Sign up</h2>
                       <p>
-                        Welcome To Electrify , Please Sign up to make a request
-                        for joining the revolution of shared renewable energy.
+                        Welcome To NGI gps  
                       </p>
                       <Link to="/register">
                         <Button

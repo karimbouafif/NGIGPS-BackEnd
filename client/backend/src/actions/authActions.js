@@ -29,7 +29,7 @@ export const registerUser = userData => dispatch => {
 
 export const loginUser = userData => dispatch => {
   axios
-    .post('/users/mobile/signin', userData)
+    .post('/users/login', userData)
     .then(res => {
       const { token } = res.data;
       localStorage.setItem('token', token);
