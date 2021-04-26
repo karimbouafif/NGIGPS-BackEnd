@@ -1,24 +1,24 @@
 import axios from "../api";
 import {
-  ADD_EVENT,
-  GET_EVENTS,
-  GET_EVENT,
-  DELETE_EVENT,
-  EVENT_LOADING,
+  ADD_MISSION,
+  GET_MISSIONS,
+  GET_MISSION,
+  DELETE_MISSION,
+  MISSION_LOADING,
   CLEAR_ERRORS,
   GET_ERRORS,
-  EDIT_EVENT,
-  UNARCHIVE_EVENT,
-  ARCHIVE_EVENT,
-  IS_MODIFIED_EVENT
+  EDIT_MISSION,
+  UNARCHIVE_MISSION,
+  ARCHIVE_MISSION,
+  IS_MODIFIED_MISSION
 } from "../actions/types";
 
 export const addEvent = (eventData) => dispatch => {
   dispatch(clearErrors());
-  axios.post("/events/add", eventData)
+  axios.post("/missions/add", eventData)
     .then(res =>
       dispatch({
-        type: ADD_EVENT,
+        type: ADD_MISSION,
         payload: res.data
       })
     )
@@ -37,10 +37,10 @@ export const addEvent = (eventData) => dispatch => {
 
 export const editEvent = (eventData,id) => dispatch => {
   dispatch(clearErrors());
-  axios.put(`/events/update/${id}`, eventData)
+  axios.put(`/missions/update/${id}`, eventData)
     .then(res => {
       dispatch({
-        type: EDIT_EVENT,
+        type: EDIT_MISSION,
         payload: res.data
       });
     })
@@ -59,10 +59,10 @@ export const editEvent = (eventData,id) => dispatch => {
 
 export const archiveEvent = (id) => dispatch => {
   dispatch(clearErrors());
-  axios.put(`/events/archive/${id}`)
+  axios.put(`/missions/archive/${id}`)
     .then(res =>
       dispatch({
-        type: ARCHIVE_EVENT,
+        type: ARCHIVE_MISSION,
         payload: res.data
       })
     )
@@ -81,10 +81,10 @@ export const archiveEvent = (id) => dispatch => {
 
 export const unarchiveEvent = (id) => dispatch => {
   dispatch(clearErrors());
-  axios.put(`/events/unarchive/${id}`)
+  axios.put(`/missions/unarchive/${id}`)
     .then(res =>
       dispatch({
-        type: UNARCHIVE_EVENT,
+        type: UNARCHIVE_MISSION,
         payload: res.data
       })
     )
@@ -106,10 +106,10 @@ export const unarchiveEvent = (id) => dispatch => {
 export const getEvents = () => dispatch => {
   dispatch(setEventLoading());
   axios
-    .get("/events/")
+    .get("/missions/")
     .then(res => {
       dispatch({
-        type: GET_EVENTS,
+        type: GET_MISSIONS,
         payload: res.data
       });
     })
@@ -129,10 +129,10 @@ export const getEvents = () => dispatch => {
 export const getEvent = id => dispatch => {
   dispatch(setEventLoading());
   axios
-    .get(`/events/${id}`)
+    .get(`/missions/${id}`)
     .then(res =>
       dispatch({
-        type: GET_EVENT,
+        type: GET_MISSION,
         payload: res.data
       })
     )
@@ -152,10 +152,10 @@ export const getEvent = id => dispatch => {
 export const deleteEvent = id => dispatch => {
   dispatch(clearErrors());
   axios
-    .delete(`/events/delete/${id}`)
+    .delete(`/missions/delete/${id}`)
     .then(res =>
       dispatch({
-        type: DELETE_EVENT,
+        type: DELETE_MISSION,
         payload: id
       })
     )
@@ -201,12 +201,12 @@ export const deleteEvent = id => dispatch => {
 // Set loading state
 export const setEventLoading = () => {
   return {
-    type: EVENT_LOADING
+    type: MISSION_LOADING
   };
 };
 export const setIsModifiedEventLoading = () => {
   return {
-    type: IS_MODIFIED_EVENT
+    type: IS_MODIFIED_MISSION
   };
 };
 

@@ -1,13 +1,13 @@
 import {
-  ADD_EVENT,
-  GET_EVENTS,
-  GET_EVENT,
-  DELETE_EVENT,
-  EVENT_LOADING,
-  EDIT_EVENT,
-  UNARCHIVE_EVENT,
-  ARCHIVE_EVENT,
-  IS_MODIFIED_EVENT
+  ADD_MISSION,
+  GET_MISSIONS,
+  GET_MISSION,
+  DELETE_MISSION,
+  MISSION_LOADING,
+  EDIT_MISSION,
+  UNARCHIVE_MISSION,
+  ARCHIVE_MISSION,
+  IS_MODIFIED_MISSION
 } from "../actions/types";
 
 const initialState = {
@@ -21,51 +21,51 @@ const initialState = {
 
 export default function(state = initialState, action) {
   switch (action.type) {
-    case EVENT_LOADING:
+    case MISSION_LOADING:
       return {
         ...state,
         loading: true
       };
-      case IS_MODIFIED_EVENT:
+      case IS_MODIFIED_MISSION:
         return {
           ...state,
           isModified:false
         };
-    case GET_EVENTS:
+    case GET_MISSIONS:
       return {
         ...state,
         events: action.payload,
         loading: false
       };
-    case GET_EVENT:
+    case GET_MISSION:
       return {
         ...state,
         event: action.payload,
         loading: false
       };
-    case ADD_EVENT:
+    case ADD_MISSION:
       return {
         ...state,
         events: [...state.events,action.payload],
         event: action.payload
       };
-    case EDIT_EVENT:
+    case EDIT_MISSION:
       return {
         ...state,
         isModified:true,
         events: state.events.map((event) => event._id === action.payload._id ? event = action.payload : event)
       };
-    case DELETE_EVENT:
+    case DELETE_MISSION:
       return {
         ...state,
         events: state.events.filter(event => event._id !== action.payload),
       };
-    case UNARCHIVE_EVENT: 
+    case UNARCHIVE_MISSION: 
     return {
       ...state,
       events: state.events.map((event) => event._id === action.payload._id ? event = action.payload : event)
     };
-    case ARCHIVE_EVENT: 
+    case ARCHIVE_MISSION: 
     return {
       ...state,
       events: state.events.map((event) => event._id === action.payload._id ? event = action.payload : event)
