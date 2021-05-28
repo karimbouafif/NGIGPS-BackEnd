@@ -47,7 +47,7 @@ export default {
         }
       ]
     },
-    /*
+    
     {
       name: "Stations",
       icon: "fa fa-quote-right",
@@ -70,12 +70,13 @@ export default {
       ]
     }
     ,
+    
     {
-      name: "Vélos",
+      name: "Voitures",
       icon: "fa fa-quote-right",
       children: [
         {
-          name: "BikesMap",
+          name: "CarsMap",
           url: "/bikes/Map",
           icon: "fa fa-plus"
         },
@@ -91,7 +92,7 @@ export default {
         }
       ]
     }
-    */
+    
   ]
   
 };

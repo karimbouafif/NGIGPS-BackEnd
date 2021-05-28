@@ -15,7 +15,7 @@ import {
 
 export const addBike = (bikeData) => dispatch => {
   dispatch(clearErrors());
-  axios.post("/bikes/add", bikeData)
+  axios.post("/voitures/add", bikeData)
     .then(res =>
       dispatch({
         type: ADD_BIKE,
@@ -37,7 +37,7 @@ export const addBike = (bikeData) => dispatch => {
 
 export const editBike = (bikeData,id) => dispatch => {
   dispatch(clearErrors());
-  axios.put(`/bikes/update/${id}`, bikeData)
+  axios.put(`/voitures/update/${id}`, bikeData)
     .then(res => {
       dispatch({
         type: EDIT_BIKE,
@@ -59,7 +59,7 @@ export const editBike = (bikeData,id) => dispatch => {
 
 export const archiveBike = (id) => dispatch => {
   dispatch(clearErrors());
-  axios.put(`/bikes/archive/${id}`)
+  axios.put(`/voitures/archive/${id}`)
     .then(res =>
       dispatch({
         type: ARCHIVE_BIKE,
@@ -81,7 +81,7 @@ export const archiveBike = (id) => dispatch => {
 
 export const unarchiveBike = (id) => dispatch => {
   dispatch(clearErrors());
-  axios.put(`/bikes/unarchive/${id}`)
+  axios.put(`/voitures/unarchive/${id}`)
     .then(res =>
       dispatch({
         type: UNARCHIVE_BIKE,
@@ -106,7 +106,7 @@ export const unarchiveBike = (id) => dispatch => {
 export const getBikes = () => dispatch => {
   dispatch(setBikeLoading());
   axios
-    .get("/bikes/")
+    .get("/voitures/")
     .then(res => {
       dispatch({
         type: GET_BIKES,
@@ -129,7 +129,7 @@ export const getBikes = () => dispatch => {
 export const getBike = id => dispatch => {
   dispatch(setBikeLoading());
   axios
-    .get(`/bikes/${id}`)
+    .get(`/voitures/${id}`)
     .then(res =>
       dispatch({
         type: GET_BIKE,
@@ -152,7 +152,7 @@ export const getBike = id => dispatch => {
 export const deleteBike = id => dispatch => {
   dispatch(clearErrors());
   axios
-    .delete(`/bikes/delete/${id}`)
+    .delete(`/voitures/delete/${id}`)
     .then(res =>
       dispatch({
         type: DELETE_BIKE,

@@ -1,7 +1,8 @@
 missionTypes = [
-    'Administration',
-    'Etudiant',
-    'Clubs',
+    'Haut',
+    'Moyen',
+    'Faible',
+    'En Attente',
 ]
 
 module.exports = missionTypes;

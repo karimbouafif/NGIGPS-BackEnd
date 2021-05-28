@@ -33,6 +33,50 @@ router.get('/:id', (req, res) => {
         .catch((err) => res.send(err));
 });
 
+
+/* Add voitures .
+@Route : voitures/add + body {} without jwt 
+*/
+router.post(
+    '/addCar',
+    upload.single('imageData'),
+    (req, res) => {
+        var newVoiture;
+        if (req.file) {
+            newVoiture = new VoitureModel({
+                title: req.body.title,
+                description: req.body.description,
+                type: req.body.type,
+                archived: false,
+                user: req.body.user,
+                matricule: req.body.matricule,
+                etat: req.body.etat,
+                disponibilite: req.body.disponibilite,
+                image: "image",
+
+
+            });
+        }
+        else{
+            newVoiture = new VoitureModel({
+                title: req.body.title,
+                description: req.body.description,
+                type: req.body.type,
+                archived: false, 
+                matricule: req.body.matricule,
+                etat: req.body.etat,
+                disponibilite: req.body.disponibilite,
+              
+            });
+        }
+        newVoiture
+            .save()
+            .then((voiture) => res.json(voiture))
+            .catch((err) => res.status(400).json(err));
+    }
+);
+
+
 /* Add voitures .
 @Route : voitures/add + body {}
 */

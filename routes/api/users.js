@@ -67,6 +67,19 @@ router.get('/', passport.authenticate('jwt', { session: false }),(req, res) => {
 
 
 
+/*GET All Role Users . 
+/Route : users/users
+*/
+router.get('/users', (req, res) => {
+  UserModel.find()
+      .where({role:"user"})
+      .then((data) => {
+          res.json(data);
+      })
+      .catch((err) => res.send(err));
+});
+
+
 // @route POST api/users/register
 // @desc Register user
 // @access Public
@@ -89,6 +102,7 @@ const { errors, isValid } = validateRegisterInput(req.body);
             fullname:req.body.fullname,
             //avatar:avatar,
             password:req.body.password,
+            isActive:false,
             role:"admin"}
     );
 
@@ -274,6 +288,25 @@ router.post('/mobile/signup/local', (req, res,done) => {
 
 
 });
+
+//Active users finder API
+router.get("/users/active", (req, res) => {
+  const users = UserModel.find({ isActive: true });
+  users.exec().then(data => {
+    res.json(data);
+  });
+});
+
+//Inactive users finder API
+router.get("/users/inactive", (req, res) => {
+  const users = UserModel.find({ isActive: false });
+  users.exec().then(data => {
+    res.json(data);
+  });
+});
+
+
+
 
 
 module.exports = router ; 

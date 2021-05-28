@@ -13,10 +13,15 @@ const errorHandler = require('errorhandler');
 const mongoose = require('mongoose');
 const UserModel = require("./models/model.user");
 const keys = require('./config/keys');
-
-
+const http =require('http');
+var io = require('socket.io')(http);
 let app = express();
 let server = require('http').createServer(app);
+
+
+
+
+
 
 let mongoUrl = keys.mongoURI;
 
@@ -69,6 +74,16 @@ app.use(cookieParser());
 // ******************* call all routes ***************************
 app.use('/uploads',express.static('uploads'))
 app.use('/api', require('./routes/api'));
+
+
+//Middleware 
+io.on('connection', (socket) => { /* socket object may be used to send specific messages to the new connected client */
+  console.log('new client connected');
+  socket.emit('connection', null);
+});
+
+
+
 
 // error handling middleware should be loaded after loading the routes
 app.use(errorHandler());

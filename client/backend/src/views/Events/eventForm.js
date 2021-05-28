@@ -25,7 +25,7 @@ class eventForm extends Component {
       dateStart: '',
       dateEnd: '',
       description: '',
-      type: 'Administration',
+      type: 'Admin',
       imageData: null,
       selectedFile: null,
       url: ''
@@ -153,9 +153,10 @@ class eventForm extends Component {
                     onChange={this.handleInputChange}
                   >
                     <option disabled>veuillez choisir le type</option>
-                    <option value="Administration">Administration </option>
-                    <option value="Etudiant"> Etudiant </option>
-                    <option value="Clubs"> Clubs </option>
+                    <option value="Haut">Haut </option>
+                    <option value="Moyen"> Moyen </option>
+                    <option value="Faible"> Faible </option>
+                    <option value="En Attente"> En Attente </option>
                   </Input>
                 </Col>
                 <Col md="8">

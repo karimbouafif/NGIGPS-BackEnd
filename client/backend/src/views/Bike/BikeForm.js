@@ -48,6 +48,26 @@ class bikeForm extends Component {
 
     });
   };
+  componentDidMount() {
+    this.getUsers();
+  
+
+  }
+  getUsers = () => {
+    fetch("http://192.168.1.15:4000/api/users/users")  // **Api for fetching**
+      .then(response => response.json())
+      .then((responseJson)=> {
+        this.setState({
+        
+          loading: false,
+        
+          dataSource: responseJson,
+     
+        })
+        
+      })
+      .catch(error=>console.log(error)) //to catch the errors if any
+  }
 
 
   handleInputChange = event => {
