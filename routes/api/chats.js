@@ -1,11 +1,8 @@
 const router = require('express').Router();
-const http = require("http");
-const socketIo = require("socket.io");
-const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
-
-const User = require("../../models/model.user");
 const { ChatModel } = require('../../models');
+const passport = require('passport');
+
+
 
 
 //New chat message API
@@ -77,9 +74,10 @@ router.get("/chats/:sender/:reciever", (req, res) => {
       }
     });
   });
-  
-  //Chatrooms getter API
-  router.get("/chats/:userId", (req, res) => {
+
+
+//Chatrooms getter API
+router.get("/chats/:userId", (req, res) => {
     const chat = ChatModel.find({
       $or: [{ reciever: req.params.userId }, { sender: req.params.userId }]
     });
@@ -92,7 +90,10 @@ router.get("/chats/:sender/:reciever", (req, res) => {
       }
     });
   });
-  
+
+
+
+
 
 
 

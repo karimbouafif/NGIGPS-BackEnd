@@ -5,7 +5,9 @@ const profileRoutes = require('./profile');
 const postsRoutes = require('./posts');
 const missionsRoutes = require('./missions');
 const voituresRoutes= require('./voitures');
-const chatRoutes = require('./chat');
+const chatsRoutes = require('./chats');
+const broadcastsRoutes = require('./broadcast');
+
 
 router.get('/', (req, res) => {
   res.send({
@@ -17,7 +19,8 @@ router.use('/profile', profileRoutes);
 router.use('/users', userRoutes);
 router.use('/missions',missionsRoutes);
 router.use('/voitures',voituresRoutes);
-router.use('/chats',chatRoutes);
+router.use('/chats',chatsRoutes);
+router.use('/broadcasts',broadcastsRoutes);
 
 
 module.exports = router;

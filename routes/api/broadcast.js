@@ -1,12 +1,9 @@
+
 const router = require('express').Router();
-const http = require("http");
-const socketIo = require("socket.io");
-const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
-
-
-const Chat = require("../../models/model.chat");
 const { BroadcastModel } = require('../../models');
+const passport = require('passport');
+const { Router } = require('express');
+
 
 //New Broadcast Messages API
 router.post("/broadcast", (req, res) => {
@@ -34,7 +31,8 @@ router.post("/broadcast", (req, res) => {
       }
     });
   });
-  
+
+
 
 
 

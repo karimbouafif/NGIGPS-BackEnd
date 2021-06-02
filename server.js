@@ -11,15 +11,17 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const errorHandler = require('errorhandler');
 const mongoose = require('mongoose');
-const UserModel = require("./models/model.user");
+//const UserModel = require("./models/model.user");
 const keys = require('./config/keys');
 const http =require('http');
-var io = require('socket.io')(http);
 let app = express();
-let server = require('http').createServer(app);
+const socketIo = require("socket.io");
+const server = http.createServer(app); //Create server with express
+const io = socketIo(server);
 
 
-
+//const User = require("./models/User");
+const {UserModel} = require('./models');
 
 
 
@@ -75,11 +77,60 @@ app.use(cookieParser());
 app.use('/uploads',express.static('uploads'))
 app.use('/api', require('./routes/api'));
 
+var clients = []; //connected clients
 
-//Middleware 
-io.on('connection', (socket) => { /* socket object may be used to send specific messages to the new connected client */
-  console.log('new client connected');
-  socket.emit('connection', null);
+io.on("connection", socket => {
+  console.log("New User Connected");
+  socket.on("storeClientInfo", function(data) {
+    console.log(data.customId + " Connected");
+    //store the new client
+    var clientInfo = new Object();
+    clientInfo.customId = data.customId;
+    clientInfo.clientId = socket.id;
+    clients.push(clientInfo);
+
+    //update the active status
+    const res = User.updateOne({ id: data.customId }, { isActive: true });
+    res.exec().then(() => {
+      console.log("Activated " + data.customId);
+
+      //Notify others
+      socket.broadcast.emit("update", "Updated");
+      console.log("emmited");
+    });
+  });
+
+  socket.on("disconnect", function(data) {
+    for (var i = 0, len = clients.length; i < len; ++i) {
+      var c = clients[i];
+
+      if (c.clientId == socket.id) {
+        //remove the client
+        clients.splice(i, 1);
+        console.log(c.customId + " Disconnected");
+
+        //update the active status
+        const res = User.updateOne({ id: c.customId }, { isActive: false });
+        res.exec().then(data => {
+          console.log("Deactivated " + c.customId);
+
+          //notify others
+          socket.broadcast.emit("update", "Updated");
+        });
+        break;
+      }
+    }
+  });
+});
+
+//Messages Socket
+const chatSocket = io.of("/chatsocket");
+chatSocket.on("connection", function(socket) {
+  //On new message
+  socket.on("newMessage", data => {
+    //Notify the room
+    socket.broadcast.emit("incommingMessage", "reload");
+  });
 });
 
 

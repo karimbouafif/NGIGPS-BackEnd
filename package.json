@@ -12,6 +12,7 @@
 	"scripts": {
 		"server": "nodemon server.js",
 		"start": "node build.js"
+		
 	},
 	"dependencies": {
 		"@mapbox/mapbox-gl-directions": "^4.0.3",

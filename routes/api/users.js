@@ -305,7 +305,12 @@ router.get("/users/inactive", (req, res) => {
   });
 });
 
-
+router.get("/find/:id", (req, res) => {
+  const user = UserModel.find({ id: req.params.id });
+  user.exec().then(data => {
+    res.json(data[0]);
+  });
+});
 
 
 
