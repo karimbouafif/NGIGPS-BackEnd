@@ -6,3 +6,4 @@ missionTypes = [
 ]
 
 module.exports = missionTypes;
+

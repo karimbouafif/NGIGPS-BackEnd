@@ -16,13 +16,54 @@ const keys = require('./config/keys');
 const http =require('http');
 let app = express();
 const socketIo = require("socket.io");
-const server = http.createServer(app); //Create server with express
-const io = socketIo(server);
+
 
 
 //const User = require("./models/User");
 const {UserModel} = require('./models');
+/*
+const Pusher = require('pusher');
 
+const PushNotifications = require('@pusher/push-notifications-server');
+
+
+const pusher = new Pusher({
+  appId: "1213426",
+  key: "9dabad3492f123ba6106",
+  secret: "00ed3a825fbb6333bc38",
+  cluster: "eu",
+  useTLS: true
+});
+
+pusher.trigger("my-channel", "my-event", {
+  message: "test ngi"
+});
+
+*/
+
+const server = http.createServer(app);
+
+const io = socketIo(server);
+
+let interval;
+
+io.on("connection", (socket) => {
+  console.log("New client connected");
+  if (interval) {
+    clearInterval(interval);
+  }
+  interval = setInterval(() => getApiAndEmit(socket), 1000);
+  socket.on("disconnect", () => {
+    console.log("Client disconnected");
+    clearInterval(interval);
+  });
+});
+
+const getApiAndEmit = socket => {
+  const response = new Date();
+  // Emitting a new message. Will be consumed by the client
+  socket.emit("FromAPI", response);
+};
 
 
 let mongoUrl = keys.mongoURI;
@@ -76,6 +117,11 @@ app.use(cookieParser());
 // ******************* call all routes ***************************
 app.use('/uploads',express.static('uploads'))
 app.use('/api', require('./routes/api'));
+
+
+
+
+
 
 var clients = []; //connected clients
 
@@ -132,6 +178,12 @@ chatSocket.on("connection", function(socket) {
     socket.broadcast.emit("incommingMessage", "reload");
   });
 });
+
+
+
+
+
+
 
 
 

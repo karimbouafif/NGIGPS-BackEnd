@@ -61,14 +61,14 @@ class detailsEvent extends Component {
                     <h5> Date Debut - Date Fin :</h5>
 
                     <p className="mb-3">
-                      Du {moment(event.dateStart).format('MMM Do YY')} Jusqu'a{' '}
-                      {moment(event.dateEnd).format('MMM Do YY')}
+                      Du {moment(event.start).format('MMM Do YY')} Jusqu'a{' '}
+                      {moment(event.end).format('MMM Do YY')}
                     </p>
                   </div>
                   <div className="item">
                     <h5>Description :</h5>
 
-                    <p className="mb-3">{event.description}</p>
+                    <p className="mb-3">{event.summary}</p>
                   </div>
                   <div className="item">
                     <h5>Url :</h5>

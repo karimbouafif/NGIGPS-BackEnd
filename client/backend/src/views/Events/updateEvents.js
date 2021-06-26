@@ -21,9 +21,9 @@ import moment from 'moment';
 class updateEvents extends Component {
   state = {
     title: '',
-    dateStart: '',
-    dateEnd:'',
-    description: '',
+    start: '',
+    end:'',
+    summary: '',
     type: 'Administration',
     archived: '',
     imageData: null,
@@ -41,9 +41,9 @@ class updateEvents extends Component {
   componentWillReceiveProps(nextProps) {
     this.setState({
       title: nextProps.event.title,
-      dateStart: nextProps.event.dateStart,
-      dateEnd: nextProps.event.dateEnd,
-      description: nextProps.event.description,
+      start: nextProps.event.start,
+      end: nextProps.event.end,
+      summary: nextProps.event.summary,
       archived: nextProps.event.archived,
       type: nextProps.event.type,
       url: nextProps.event.url
@@ -83,9 +83,9 @@ class updateEvents extends Component {
       newEvent.append('imageData', this.state.selectedFile, this.state.selectedFile.name);
     } 
     newEvent.append('title', this.state.title);
-    newEvent.append('dateStart', this.state.dateStart);
-    newEvent.append('dateEnd', this.state.dateEnd);
-    newEvent.append('description', this.state.description);
+    newEvent.append('start', this.state.start);
+    newEvent.append('end', this.state.end);
+    newEvent.append('summary', this.state.summary);
     newEvent.append('archived', this.state.archived);
     newEvent.append('type', this.state.type);
     newEvent.append('url', this.state.url);
@@ -138,7 +138,7 @@ class updateEvents extends Component {
                 <Col xs="12" md="9">
                   <Input
                     onChange={this.handleInputChange}
-                    value={moment(this.state.dateStart).format('YYYY-MM-DD')}
+                    value={moment(this.state.start).format('YYYY-MM-DD')}
                     type="date"
                     id="date-input"
                     name="dateStart"
@@ -155,7 +155,7 @@ class updateEvents extends Component {
                 <Col xs="12" md="9">
                   <Input
                     onChange={this.handleInputChange}
-                    value={moment(this.state.dateEnd).format('YYYY-MM-DD')}
+                    value={moment(this.state.end).format('YYYY-MM-DD')}
                     type="date"
                     id="date-input"
                     name="dateEnd"
@@ -172,7 +172,7 @@ class updateEvents extends Component {
                     <Input
                       type="textarea"
                       name="description"
-                      value={this.state.description}
+                      value={this.state.summary}
                       onChange={this.handleInputChange}
                       placeholder="Description..."
                     />

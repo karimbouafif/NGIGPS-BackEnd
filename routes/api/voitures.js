@@ -3,6 +3,30 @@ const { VoitureModel } = require('../../models');
 const passport = require('passport');
 const { upload } = require('../../utils/Uploader');
 
+
+
+
+
+/* GET 3 Latest Affectation Voitures. 
+@Route : voitures/
+*/
+router.get('/latest', (req, res) => {
+    VoitureModel.find()
+      .sort('-createdAt')
+      .limit(3)
+      .then((data) => {
+        return res.json(data);
+      })
+      // .catch((err) => res.send(err));
+      .catch(error => { 
+        console.log('caught', error.message); 
+      });
+  });
+  
+
+
+
+
 /* GET All voitures .
 @Route : voitures/
 */

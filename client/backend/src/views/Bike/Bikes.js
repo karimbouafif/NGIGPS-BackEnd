@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Bike from '../components/Bike';
-import { getBikes } from '../../actions/bikeActions';
+  import { getBikes } from '../../actions/bikeActions';
 
 import {
   Card,

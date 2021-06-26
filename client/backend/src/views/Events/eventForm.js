@@ -22,9 +22,9 @@ class eventForm extends Component {
     super(props);
     this.state = {
       title: '',
-      dateStart: '',
-      dateEnd: '',
-      description: '',
+      start: '',
+      end: '',
+      summary: '',
       type: 'Admin',
       imageData: null,
       selectedFile: null,
@@ -35,9 +35,9 @@ class eventForm extends Component {
   handlerCancel = e => {
     this.setState({
       title: '',
-      dateStart: new Date(),
-      dateEnd: new Date(),
-      description: '',
+      start: new Date(),
+      end: new Date(),
+      summary: '',
       type: '',
       imageData: null,
       selectedFile: null,
@@ -66,9 +66,9 @@ class eventForm extends Component {
       newEvent.append('imageData', this.state.selectedFile, this.state.selectedFile.name);
     }
     newEvent.append('title', this.state.title);
-    newEvent.append('dateStart', this.state.dateStart);
-    newEvent.append('dateEnd', this.state.dateEnd);
-    newEvent.append('description', this.state.description);
+    newEvent.append('start', this.state.start);
+    newEvent.append('end', this.state.end);
+    newEvent.append('summary', this.state.summary);
     newEvent.append('type', this.state.type);
     newEvent.append('url', this.state.url);
     newEvent.append('user', this.props.user.id._id);
@@ -108,7 +108,7 @@ class eventForm extends Component {
                 <Col xs="12" md="9">
                   <Input
                     onChange={this.handleInputChange}
-                    selected={this.state.dateStart}
+                    selected={this.state.start}
                     type="date"
                     id="date-input"
                     name="dateStart"
@@ -121,7 +121,7 @@ class eventForm extends Component {
                 <Col xs="12" md="9">
                   <Input
                     onChange={this.handleInputChange}
-                    selected={this.state.dateEnd}
+                    selected={this.state.end}
                     type="date"
                     id="date-input"
                     name="dateEnd"
@@ -136,7 +136,7 @@ class eventForm extends Component {
                   <Input
                     type="textarea"
                     name="description"
-                    value={this.state.description}
+                    value={this.state.summary}
                     onChange={this.handleInputChange}
                     placeholder="Description..."
                   />

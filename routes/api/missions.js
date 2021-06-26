@@ -4,7 +4,15 @@ const passport = require('passport');
 const { upload } = require('../../utils/Uploader');
 
 
-
+/* GET By  Mission Type . 
+@Route : mission/
+*/
+router.get('/missiontype', (req, res) => {
+  const missions = MissionModel.find({ type: 'Haut' });
+  missions.exec().then(data => {
+    res.json(data);
+  });
+});
 
 /* GET All Mission . 
 @Route : mission/
@@ -12,7 +20,7 @@ const { upload } = require('../../utils/Uploader');
 router.get('/', (req, res) => {
   MissionModel.find()
     .populate('user')
-    .sort('-dateStart')
+    .sort('-start')
     .then((data) => {
       res.json(data);
     })
@@ -24,7 +32,7 @@ router.get('/', (req, res) => {
 */
 router.get('/latest', (req, res) => {
   MissionModel.find()
-    .sort('-dateStart')
+    .sort('-start')
     .limit(3)
     .then((data) => {
       return res.json(data);
@@ -62,15 +70,15 @@ router.post(
   (req, res) => {
     newMission = new MissionModel({
       title: req.body.title,
-      dateStart: req.body.dateStart,
-      dateEnd: req.body.dateEnd,
+      start: req.body.start,
+      end: req.body.end,
       start_adress:req.body.start_adress,
       end_adress:req.body.end_adress,
-      description: req.body.description,
+      summary: req.body.summary,
       type: req.body.type,
-     // archived: false,
+      archived: false,
       url: req.body.url,
-    //  image: "image",
+      image: req.file.path,
       user: req.body.user,
     });
 
@@ -97,9 +105,9 @@ router.put(
     if (req.file) {
       missionUpdated = {
         title: req.body.title,
-        dateStart: req.body.dateStart,
-        dateEnd: req.body.dateEnd,
-        description: req.body.description,
+        start: req.body.start,
+        end: req.body.end,
+        summary: req.body.summary,
         type: req.body.type,
         url: req.body.url,
         image: req.file.path,
@@ -108,9 +116,9 @@ router.put(
     } else {
       missionUpdated = {
         title: req.body.title,
-        dateStart: req.body.dateStart,
-        dateEnd: req.body.dateEnd,
-        description: req.body.description,
+        start: req.body.start,
+        end: req.body.end,
+        summary: req.body.summary,
         type: req.body.type,
         url: req.body.url,
         user: req.body.user,

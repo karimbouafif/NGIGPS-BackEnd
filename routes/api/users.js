@@ -9,8 +9,15 @@ const stripeApi = require('stripe')(process.env.STRIPESECRETKEY);
 //load User model
 const {UserModel} = require('../../models');
 const keys = require('../../config/keys');
+const Pusher = require('pusher');
 
-
+const pusher = new Pusher({
+  appId: "1213426",
+  key: "9dabad3492f123ba6106",
+  secret: "00ed3a825fbb6333bc38",
+  cluster: "eu",
+  useTLS: true
+});
 // Load input validation
 const validateRegisterInput = require("../../validation/register");
 const validateLoginInput = require("../../validation/login");
@@ -311,7 +318,12 @@ router.get("/find/:id", (req, res) => {
     res.json(data[0]);
   });
 });
-
-
-
+/*
+router.post('/pusher/auth', function(req, res) {
+  var socketId = req.body.socket_id;
+  var channel = req.body.channel_name;
+  var auth = pusher.authenticate(socketId, channel);
+  res.send(auth);
+});
+*/
 module.exports = router ; 

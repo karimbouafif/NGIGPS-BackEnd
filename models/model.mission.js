@@ -6,9 +6,9 @@ const missionSchema = mongoose.Schema(
     title: String,
     start_adress:String,
     end_adress:String,
-    dateStart: Date,
-    dateEnd: Date,
-    description: String,
+    start: Date,
+    end: Date,
+    summary: String,
     archived: {
       type: Boolean,
       required: false
