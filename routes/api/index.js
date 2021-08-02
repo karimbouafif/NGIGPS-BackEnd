@@ -7,6 +7,7 @@ const missionsRoutes = require('./missions');
 const voituresRoutes= require('./voitures');
 const chatsRoutes = require('./chats');
 const broadcastsRoutes = require('./broadcast');
+const notificationsRoutes = require('./notifications')
 
 
 router.get('/', (req, res) => {
@@ -21,6 +22,7 @@ router.use('/missions',missionsRoutes);
 router.use('/voitures',voituresRoutes);
 router.use('/chats',chatsRoutes);
 router.use('/broadcasts',broadcastsRoutes);
+router.use('/notifications',notificationsRoutes);
 
 
 module.exports = router;

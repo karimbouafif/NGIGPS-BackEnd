@@ -3,19 +3,27 @@ const missionTypes = require('../enums/mission.types');
 const Schema = mongoose.Schema;
 const missionSchema = mongoose.Schema(
   {
-    title: String,
+    taskTitle: String,
     start_adress:String,
     end_adress:String,
-    start: Date,
-    end: Date,
-    summary: String,
+    taskStatus:String,
+    taskTime: Date,
+    email:Array,
+    taskContent: String,
     archived: {
       type: Boolean,
       required: false
     },
-    type: {
-      type: String,
-      enum: missionTypes
+    priorityIs: Number,
+  
+    
+    isCompleted: {
+      type: Boolean,
+      required: false
+    },
+    isUpdated: {
+      type: Boolean,
+      required: false
     },
     url: String,
     image: {

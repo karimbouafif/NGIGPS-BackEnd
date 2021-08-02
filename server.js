@@ -12,11 +12,12 @@ const cors = require('cors');
 const errorHandler = require('errorhandler');
 const mongoose = require('mongoose');
 //const UserModel = require("./models/model.user");
+const userRoutes =require('./routes/api/users')
 const keys = require('./config/keys');
 const http =require('http');
 let app = express();
 const socketIo = require("socket.io");
-
+const dummyDb = { subscription: null };
 
 
 //const User = require("./models/User");
@@ -43,27 +44,7 @@ pusher.trigger("my-channel", "my-event", {
 
 const server = http.createServer(app);
 
-const io = socketIo(server);
 
-let interval;
-
-io.on("connection", (socket) => {
-  console.log("New client connected");
-  if (interval) {
-    clearInterval(interval);
-  }
-  interval = setInterval(() => getApiAndEmit(socket), 1000);
-  socket.on("disconnect", () => {
-    console.log("Client disconnected");
-    clearInterval(interval);
-  });
-});
-
-const getApiAndEmit = socket => {
-  const response = new Date();
-  // Emitting a new message. Will be consumed by the client
-  socket.emit("FromAPI", response);
-};
 
 
 let mongoUrl = keys.mongoURI;
@@ -119,66 +100,40 @@ app.use('/uploads',express.static('uploads'))
 app.use('/api', require('./routes/api'));
 
 
+const sendNotification = (subscription, dataToSend = "") => {
+  webpush.sendNotification(subscription, dataToSend);
+};
 
-
-
-
-var clients = []; //connected clients
-
-io.on("connection", socket => {
-  console.log("New User Connected");
-  socket.on("storeClientInfo", function(data) {
-    console.log(data.customId + " Connected");
-    //store the new client
-    var clientInfo = new Object();
-    clientInfo.customId = data.customId;
-    clientInfo.clientId = socket.id;
-    clients.push(clientInfo);
-
-    //update the active status
-    const res = User.updateOne({ id: data.customId }, { isActive: true });
-    res.exec().then(() => {
-      console.log("Activated " + data.customId);
-
-      //Notify others
-      socket.broadcast.emit("update", "Updated");
-      console.log("emmited");
-    });
-  });
-
-  socket.on("disconnect", function(data) {
-    for (var i = 0, len = clients.length; i < len; ++i) {
-      var c = clients[i];
-
-      if (c.clientId == socket.id) {
-        //remove the client
-        clients.splice(i, 1);
-        console.log(c.customId + " Disconnected");
-
-        //update the active status
-        const res = User.updateOne({ id: c.customId }, { isActive: false });
-        res.exec().then(data => {
-          console.log("Deactivated " + c.customId);
-
-          //notify others
-          socket.broadcast.emit("update", "Updated");
-        });
-        break;
-      }
-    }
-  });
+const saveToDatabase = async subscription => {
+  // Since this is a demo app, I am going to save this in a dummy in memory store. Do not do this in your apps.
+  // Here you should be writing your db logic to save it.
+  dummyDb.subscription = subscription;
+};
+// The new /save-subscription endpoint
+app.post("/save-subscription", async(req, res) => {
+  const subscription = req.body;
+  await saveToDatabase(subscription); //Method to save the subscription to Database
+  res.json({ message: "success" });
 });
 
-//Messages Socket
-const chatSocket = io.of("/chatsocket");
-chatSocket.on("connection", function(socket) {
-  //On new message
-  socket.on("newMessage", data => {
-    //Notify the room
-    socket.broadcast.emit("incommingMessage", "reload");
-  });
+//route to test send notification
+app.get("/send-notification", (req, res) => {
+  const subscription = dummyDb.subscription; //get subscription from your databse here.
+  const message = "Hello World from server";
+  sendNotification(subscription, message);
+  res.json({ message: "message sent" });
 });
 
+
+
+
+const io = socketIo(server)
+
+io.on("connection", function(socket) {
+    // This event will trigger when any user is connected.
+    // You can use 'socket' to emit and receive events.
+    console.log("a user connected.");
+});
 
 
 

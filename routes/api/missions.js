@@ -66,20 +66,23 @@ router.get('/:id', (req, res) => {
 router.post(
   '/add',
   upload.single('imageData'),
-  passport.authenticate('jwt', { session: false }),
+  //passport.authenticate('jwt', { session: false }),
   (req, res) => {
     newMission = new MissionModel({
-      title: req.body.title,
-      start: req.body.start,
-      end: req.body.end,
-      start_adress:req.body.start_adress,
-      end_adress:req.body.end_adress,
-      summary: req.body.summary,
-      type: req.body.type,
+      taskTitle: req.body.taskTitle,
+      taskTime: req.body.taskTime,
+      start_adress:" 8.71472,36.18222",
+      taskStatus:req.body.taskStatus,
+      end_adress: "11.098248577,36.844353618",
+      taskContent: req.body.taskContent,
+      priorityIs: req.body.priorityIs,
       archived: false,
       url: req.body.url,
-      image: req.file.path,
+      isCompleted:false,
+      isUpdated:false,
+     // image: req.file.path,
       user: req.body.user,
+      email:req.body.email,
     });
 
     newMission
@@ -107,7 +110,7 @@ router.put(
         title: req.body.title,
         start: req.body.start,
         end: req.body.end,
-        summary: req.body.summary,
+        taskContent: req.body.taskContent,
         type: req.body.type,
         url: req.body.url,
         image: req.file.path,
@@ -142,7 +145,7 @@ router.put(
 */
 router.delete(
   '/delete/:id',
-  passport.authenticate('jwt', { session: false }),
+  //passport.authenticate('jwt', { session: false }),
   (req, res) => {
     let query = {
       _id: req.params.id,
@@ -167,7 +170,20 @@ router.put('/archive/:id', (req, res) => {
     .then((mission) => res.json(mission))
     .catch((err) => res.status(400).json(err));
 });
-
+router.put('/completed/:id', (req, res) => {
+  let query = {
+    _id: req.params.id,
+  };
+  MissionModel.findOneAndUpdate(
+    query,
+    {
+      $set: { isCompleted: true },
+    },
+    { new: true }
+  )
+    .then((mission) => res.json(mission))
+    .catch((err) => res.status(400).json(err));
+});
 router.put('/unarchive/:id', (req, res) => {
   let query = {
     _id: req.params.id,

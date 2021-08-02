@@ -76,7 +76,7 @@ router.post(
                 matricule: req.body.matricule,
                 etat: req.body.etat,
                 disponibilite: req.body.disponibilite,
-                image: "image",
+                image:"uploads\1624385379961Logo.png",
 
 
             });
@@ -90,6 +90,8 @@ router.post(
                 matricule: req.body.matricule,
                 etat: req.body.etat,
                 disponibilite: req.body.disponibilite,
+                image:"uploads\1624385379961Logo.png",
+
               
             });
         }

@@ -326,4 +326,15 @@ router.post('/pusher/auth', function(req, res) {
   res.send(auth);
 });
 */
+exports.getNewMessages = async (userId) => {
+  try {
+    const user = await User.findOne({ _id: userId, newComments: true });
+    if (user) {
+      return true;
+    }
+    return false;
+  } catch (err) {
+    console.log("error fetching user info");
+  }
+};
 module.exports = router ; 
