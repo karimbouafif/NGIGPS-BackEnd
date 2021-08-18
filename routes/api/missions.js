@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { MissionModel } = require('../../models');
+const { MissionModel, UserModel } = require('../../models');
 const passport = require('passport');
 const { upload } = require('../../utils/Uploader');
 
@@ -43,6 +43,25 @@ router.get('/latest', (req, res) => {
     });
 });
 
+/*Select count Mission By User
+@Route : missions/iduser
+*/
+router.get('/iduser', (req, res) => {
+  const query = {
+    _id: req.params.id,
+  };
+
+  MissionModel
+   .count({taskStatus: 'waiting'})
+
+    .then((data) => {
+      res.json(data);
+    })
+    .catch((err) => res.send(err));
+});
+
+
+
 /* GET Single Missions. 
 @Route : missions/:id
 */
@@ -50,7 +69,8 @@ router.get('/:id', (req, res) => {
   const query = {
     _id: req.params.id,
   };
-  MissionModel.findOne(query)
+  //MissionModel.count({taskStatus: 'waiting'})
+  MissionModel.find({user:req.params.id})
     .populate('user')
     .then((data) => {
       res.json(data);
@@ -178,6 +198,20 @@ router.put('/completed/:id', (req, res) => {
     query,
     {
       $set: { isCompleted: true },
+    },
+    { new: true }
+  )
+    .then((mission) => res.json(mission))
+    .catch((err) => res.status(400).json(err));
+});
+router.put('/incompleted/:id', (req, res) => {
+  let query = {
+    _id: req.params.id,
+  };
+  MissionModel.findOneAndUpdate(
+    query,
+    {
+      $set: { isCompleted: false },
     },
     { new: true }
   )

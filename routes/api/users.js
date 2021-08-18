@@ -193,7 +193,23 @@ router.post('/mobile/signin', (req, res,done) => {
             return res.json({
               success: true,
               token :"Bearer " + token,
-          
+              user:payload
+            });
+          });
+             
+           }
+        });
+      }
+      else if (user.role==="user"){
+        bcrypt.compare(password, user.password).then(isMatch => {
+          if (isMatch) {
+            const payload ={id:user.id, username:user.username,number:user.number, fullname:user.fullname, avatar:user.avatar,email:user.email}   
+            // Sign Token
+         jwt.sign(payload, keys.secretOrKey, { expiresIn: "20 days" }, (err, token) => {
+            return res.json({
+              success: true,
+              token :"Bearer " + token,
+              user:payload
             });
           });
              

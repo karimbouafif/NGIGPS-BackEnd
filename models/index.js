@@ -4,6 +4,7 @@ const VoitureModel = require('./model.voiture')
 const BroadcastModel = require('./model.broadcast')
 const ChatModel = require('./model.chat')
 const NotificationModel = require('./model.notification')
+const ReclamationModel = require('./model.reclamation')
 
 module.exports = {
   UserModel,
@@ -11,5 +12,6 @@ module.exports = {
   VoitureModel,
   BroadcastModel,
   ChatModel,
-  NotificationModel
+  NotificationModel,
+  ReclamationModel
 };

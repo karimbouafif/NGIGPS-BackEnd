@@ -10,8 +10,3 @@ module.exports = voitureDisponibilityTypes = [
 
 ]
 
-module.exports = voitureTypes = [
-    'honda',
-    'bmw',
-    'golf',
-]

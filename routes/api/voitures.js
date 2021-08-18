@@ -70,13 +70,15 @@ router.post(
             newVoiture = new VoitureModel({
                 title: req.body.title,
                 description: req.body.description,
-                type: req.body.type,
+              
                 archived: false,
                 user: req.body.user,
                 matricule: req.body.matricule,
-                etat: req.body.etat,
-                disponibilite: req.body.disponibilite,
-                image:"uploads\1624385379961Logo.png",
+                //etat: req.body.etat,
+                //disponibilite: req.body.disponibilite,
+
+
+                //image:"uploads\1624385379961Logo.png",
 
 
             });
@@ -85,12 +87,15 @@ router.post(
             newVoiture = new VoitureModel({
                 title: req.body.title,
                 description: req.body.description,
-                type: req.body.type,
                 archived: false, 
                 matricule: req.body.matricule,
-                etat: req.body.etat,
-                disponibilite: req.body.disponibilite,
-                image:"uploads\1624385379961Logo.png",
+                  user: req.body.user,
+               // etat: req.body.etat,
+                //disponibilite: req.body.disponibilite,
+
+
+
+                //image:"uploads\1624385379961Logo.png",
 
               
             });

@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { voitureStateTypes, voitureDisponibilityTypes, voitureTypes } = require('../enums/voiture.types');
+const { voitureStateTypes, voitureDisponibilityTypes } = require('../enums/voiture.types');
 const Schema = mongoose.Schema;
 const voiturechema = mongoose.Schema(
   {
@@ -20,11 +20,7 @@ const voiturechema = mongoose.Schema(
       type: Boolean,
       required: false,
     },
-    type: {
-      type: String,
-      enum: voitureTypes,
-      required: false,
-    },
+
     image: {
       type: String,
       required: false,
@@ -36,6 +32,5 @@ const voiturechema = mongoose.Schema(
     timestamps: true,
   }
 );
-const event = mongoose.model('voiture', voiturechema);
+module.exports = mongoose.model('voiture', voiturechema );
 
-module.exports = event;
