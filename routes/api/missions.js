@@ -92,7 +92,7 @@ router.post(
       taskTitle: req.body.taskTitle,
       taskTime: req.body.taskTime,
       start_adress:" 8.71472,36.18222",
-      taskStatus:req.body.taskStatus,
+      taskStatus:"waiting",
       end_adress: "11.098248577,36.844353618",
       taskContent: req.body.taskContent,
       priorityIs: req.body.priorityIs,

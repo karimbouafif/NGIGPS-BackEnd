@@ -6,7 +6,10 @@ const reclamationSchema = mongoose.Schema(
     titre: String,
     description:String,
     cause:String,
-   
+    isCompleted: {
+      type: Boolean,
+      required: false
+    },
     user: { type: Schema.Types.ObjectId, ref: 'users' },
     mission: { type: Schema.Types.ObjectId, ref: 'mission' },
   },

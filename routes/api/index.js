@@ -8,7 +8,7 @@ const voituresRoutes= require('./voitures');
 const chatsRoutes = require('./chats');
 const broadcastsRoutes = require('./broadcast');
 const notificationsRoutes = require('./notifications')
-
+const reclamationRoutes = require('./reclamation')
 
 router.get('/', (req, res) => {
   res.send({
@@ -23,6 +23,7 @@ router.use('/voitures',voituresRoutes);
 router.use('/chats',chatsRoutes);
 router.use('/broadcasts',broadcastsRoutes);
 router.use('/notifications',notificationsRoutes);
+router.use('/reclamations',reclamationRoutes);
 
 
 module.exports = router;
